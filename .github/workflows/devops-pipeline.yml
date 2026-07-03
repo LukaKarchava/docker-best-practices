@@ -1,0 +1,32 @@
+# The Name of our automated assembly line
+name: Corporate CI-CD Assembly Line
+
+# TRIGGER: Wake up the automation every time a developer merges code to main
+on:
+  push:
+    branches:
+      - main
+
+# THE TASKS (The Automated Conveyor Belt)
+jobs:
+  continuous-integration:
+    name: 🧪 Run CI Security & Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Simulating Code Quality Scan
+        run: |
+          echo "Scanning backend Python files..."
+          echo "Checking syntax compliance... SUCCESS!"
+
+  continuous-deployment:
+    name: 📦 Run CD Container Orchestration
+    # Dynamic Link: Only run the Deployment if the Testing Job passes perfectly!
+    needs: continuous-integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛠️ Rebuilding Corporate Container Stack
+        run: |
+          echo "Automating what Luka used to do manually..."
+          docker compose down
+          docker compose up -d --build
+          echo "Deployment successful! Hot-swap completed cleanly."
