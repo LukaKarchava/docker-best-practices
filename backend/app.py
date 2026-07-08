@@ -47,7 +47,7 @@ def home():
     return jsonify({
         "status": "connected",
         "message": "Hello from the Python backend container!",
-        "location": "Tbilisi, Georgia - Managed by Luka",
+        "location": "Tbilisi, Georgia - Automated via GitHub Action CI/CD!",
         "log_status": "Visit successfully written down in the Postgres database!"
     })
 
