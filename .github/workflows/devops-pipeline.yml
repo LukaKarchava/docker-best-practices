@@ -19,7 +19,6 @@ jobs:
           echo "Checking syntax compliance... SUCCESS!"
 
   continuous-deployment:
-continuous-deployment:
     name: 📦 Run CD Container Orchestration
     needs: continuous-integration
     runs-on: ubuntu-latest
