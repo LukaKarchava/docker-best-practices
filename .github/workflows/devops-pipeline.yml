@@ -19,14 +19,18 @@ jobs:
           echo "Checking syntax compliance... SUCCESS!"
 
   continuous-deployment:
+continuous-deployment:
     name: 📦 Run CD Container Orchestration
-    # Dynamic Link: Only run the Deployment if the Testing Job passes perfectly!
     needs: continuous-integration
     runs-on: ubuntu-latest
     steps:
-      - name: 🛠️ Rebuilding Corporate Container Stack
-        run: |
-          echo "Automating what Luka used to do manually..."
-          docker compose down
-          docker compose up -d --build
-          echo "Deployment successful! Hot-swap completed cleanly."
+      - name: 🚀 Executing Remote SSH Commands to Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/docker-best-practices
+            git pull origin main
+            docker compose up -d --build
