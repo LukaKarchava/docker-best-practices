@@ -23,6 +23,27 @@ jobs:
     needs: continuous-integration
     runs-on: ubuntu-latest
     steps:
+      # --- NEW STEP 1: LOGIN TO AWS ---
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      # --- NEW STEP 2: OPEN PORT 22 FOR THIS RUNNER ---
+      - name: Get Runner IP & Open Security Group Port 22
+        id: get_ip
+        run: |
+          RUNNER_IP=$(curl -s https://checkip.amazonaws.com)
+          echo "RUNNER_IP=${RUNNER_IP}" >> $GITHUB_ENV
+          aws ec2 authorize-security-group-ingress \
+            --group-id sg-0d653b136e84959bf \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${RUNNER_IP}/32
+
+      # --- YOUR EXISTING DEPLOYMENT STEP (Kept exactly as it is!) ---
       - name: 🚀 Executing Remote SSH Commands to Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -33,3 +54,13 @@ jobs:
             cd ~/docker-best-practices
             git pull origin main
             docker compose up -d --build
+
+      # --- NEW STEP 3: SLAM THE DOOR CLOSED ---
+      - name: Revoke Security Group Port 22
+        if: always() # This forces it to run even if deployment crashes!
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id sg-0d653b136e84959bf \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ env.RUNNER_IP }}/32
